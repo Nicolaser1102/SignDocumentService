@@ -1,0 +1,6 @@
+@SignDocumentService_HostAddress = http://localhost:5051
+
+GET {{SignDocumentService_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

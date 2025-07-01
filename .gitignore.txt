@@ -1,0 +1,80 @@
+# Build output
+bin/
+obj/
+
+# Visual Studio
+.vs/
+.vscode/
+
+# User-specific files
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Rider
+.idea/
+
+# Logs
+*.log
+
+# NuGet packages
+*.nupkg
+*.snupkg
+packages/
+
+# Resharper
+_ReSharper*/
+
+# DotCover
+*.dotCover
+
+# StyleCop
+StyleCopReport.xml
+
+# DotSettings
+*.DotSettings.user
+
+# Others
+*.cache
+*.db
+*.bak
+*.backup
+*.swp
+*.pidb
+*.sdf
+*.pdb
+*.mdb
+
+# Publish output
+publish/
+Publish/
+
+# Azure Web App publish settings
+*.Publish.xml
+
+# Local History for Visual Studio Code
+.history/
+
+# Coverage results
+coverage*
+
+# JetBrains Rider
+.idea/
+
+# Temporary files
+*.tmp
+*.temp
+
+# Dotnet Tools
+.tool/
+
+# IIS Express
+iisexpress/
+
+# User secrets
+secrets.json
+
+# Docker
+docker-compose.override.yml
+docker-compose.override.yaml
