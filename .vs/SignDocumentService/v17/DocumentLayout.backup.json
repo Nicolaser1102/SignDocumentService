@@ -7,6 +7,14 @@
       "RelativeMoniker": "D:0:0:{E2094624-8B1A-46A8-9F1D-6ED51220842A}|SignDocumentService.csproj|solutionrelative:controllers\\documentocontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
+      "AbsoluteMoniker": "D:0:0:{E2094624-8B1A-46A8-9F1D-6ED51220842A}|SignDocumentService.csproj|c:\\proyectosgit\\signdocumentservice\\dto\\request\\signboxapirequest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E2094624-8B1A-46A8-9F1D-6ED51220842A}|SignDocumentService.csproj|solutionrelative:dto\\request\\signboxapirequest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E2094624-8B1A-46A8-9F1D-6ED51220842A}|SignDocumentService.csproj|c:\\proyectosgit\\signdocumentservice\\dto\\response\\rutasdocumentoresponse.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E2094624-8B1A-46A8-9F1D-6ED51220842A}|SignDocumentService.csproj|solutionrelative:dto\\response\\rutasdocumentoresponse.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{E2094624-8B1A-46A8-9F1D-6ED51220842A}|SignDocumentService.csproj|c:\\proyectosgit\\signdocumentservice\\dto\\request\\baserequest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{E2094624-8B1A-46A8-9F1D-6ED51220842A}|SignDocumentService.csproj|solutionrelative:dto\\request\\baserequest.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
@@ -50,11 +58,36 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 3,
+          "SelectedChildIndex": 5,
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 6,
+              "DocumentIndex": 1,
+              "Title": "SignBoxApiRequest.cs",
+              "DocumentMoniker": "C:\\ProyectosGit\\SignDocumentService\\Dto\\Request\\SignBoxApiRequest.cs",
+              "RelativeDocumentMoniker": "Dto\\Request\\SignBoxApiRequest.cs",
+              "ToolTip": "C:\\ProyectosGit\\SignDocumentService\\Dto\\Request\\SignBoxApiRequest.cs",
+              "RelativeToolTip": "Dto\\Request\\SignBoxApiRequest.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAqwAYAAAAWAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-07-02T21:27:25.885Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "RutasDocumentoResponse.cs",
+              "DocumentMoniker": "C:\\ProyectosGit\\SignDocumentService\\Dto\\Response\\RutasDocumentoResponse.cs",
+              "RelativeDocumentMoniker": "Dto\\Response\\RutasDocumentoResponse.cs",
+              "ToolTip": "C:\\ProyectosGit\\SignDocumentService\\Dto\\Response\\RutasDocumentoResponse.cs",
+              "RelativeToolTip": "Dto\\Response\\RutasDocumentoResponse.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAoAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-07-02T21:25:56.392Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
               "Title": "IGenericRequest.cs",
               "DocumentMoniker": "C:\\ProyectosGit\\SignDocumentService\\Interfaces\\IGenericRequest.cs",
               "RelativeDocumentMoniker": "Interfaces\\IGenericRequest.cs",
@@ -62,12 +95,11 @@
               "RelativeToolTip": "Interfaces\\IGenericRequest.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAcAAAAgAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-07-02T18:00:37.501Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-07-02T18:00:37.501Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 3,
               "Title": "BaseRequest.cs",
               "DocumentMoniker": "C:\\ProyectosGit\\SignDocumentService\\Dto\\Request\\BaseRequest.cs",
               "RelativeDocumentMoniker": "Dto\\Request\\BaseRequest.cs",
@@ -75,12 +107,11 @@
               "RelativeToolTip": "Dto\\Request\\BaseRequest.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-07-02T17:55:13.214Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-07-02T17:55:13.214Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 5,
               "Title": "appsettings.json",
               "DocumentMoniker": "C:\\ProyectosGit\\SignDocumentService\\appsettings.json",
               "RelativeDocumentMoniker": "appsettings.json",
@@ -88,8 +119,7 @@
               "RelativeToolTip": "appsettings.json",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAABYAAAADAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
-              "WhenOpened": "2025-07-01T16:33:28.939Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-07-01T16:33:28.939Z"
             },
             {
               "$type": "Document",
@@ -99,14 +129,14 @@
               "RelativeDocumentMoniker": "Controllers\\DocumentoController.cs",
               "ToolTip": "C:\\ProyectosGit\\SignDocumentService\\Controllers\\DocumentoController.cs",
               "RelativeToolTip": "Controllers\\DocumentoController.cs",
-              "ViewState": "AgIAACsAAAAAAAAAAAAUwD8AAAAxAAAAAAAAAA==",
+              "ViewState": "AgIAAI8AAAAAAAAAAAAIwKMAAAAyAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-07-01T16:28:44.656Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 4,
               "Title": "Program.cs",
               "DocumentMoniker": "C:\\ProyectosGit\\SignDocumentService\\Program.cs",
               "RelativeDocumentMoniker": "Program.cs",
@@ -114,12 +144,11 @@
               "RelativeToolTip": "Program.cs",
               "ViewState": "AgIAAC0AAAAAAAAAAAAiwEYAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-07-01T15:07:15.487Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-07-01T15:07:15.487Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 7,
+              "DocumentIndex": 9,
               "Title": "IRequest.cs",
               "DocumentMoniker": "C:\\ProyectosGit\\SignDocumentService\\Interfaces\\IRequest.cs",
               "RelativeDocumentMoniker": "Interfaces\\IRequest.cs",
@@ -127,12 +156,11 @@
               "RelativeToolTip": "Interfaces\\IRequest.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAYAAAAjAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-07-02T17:57:33.425Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-07-02T17:57:33.425Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 6,
               "Title": "GenericRequest.cs",
               "DocumentMoniker": "C:\\ProyectosGit\\SignDocumentService\\Dto\\Request\\GenericRequest.cs",
               "RelativeDocumentMoniker": "Dto\\Request\\GenericRequest.cs",
@@ -140,12 +168,11 @@
               "RelativeToolTip": "Dto\\Request\\GenericRequest.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAYAAAAqAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-07-01T17:40:53.319Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-07-01T17:40:53.319Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 5,
+              "DocumentIndex": 7,
               "Title": "SignRequest.cs",
               "DocumentMoniker": "C:\\ProyectosGit\\SignDocumentService\\Dto\\Request\\SignRequest.cs",
               "RelativeDocumentMoniker": "Dto\\Request\\SignRequest.cs",
@@ -153,12 +180,11 @@
               "RelativeToolTip": "Dto\\Request\\SignRequest.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAcAAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-07-01T15:12:41.783Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-07-01T15:12:41.783Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 8,
+              "DocumentIndex": 10,
               "Title": "launchSettings.json",
               "DocumentMoniker": "C:\\ProyectosGit\\SignDocumentService\\Properties\\launchSettings.json",
               "RelativeDocumentMoniker": "Properties\\launchSettings.json",
@@ -166,12 +192,11 @@
               "RelativeToolTip": "Properties\\launchSettings.json",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
-              "WhenOpened": "2025-07-01T18:37:06.627Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-07-01T18:37:06.627Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 9,
+              "DocumentIndex": 11,
               "Title": "BaseResponse.cs",
               "DocumentMoniker": "C:\\ProyectosGit\\SignDocumentService\\Dto\\Response\\BaseResponse.cs",
               "RelativeDocumentMoniker": "Dto\\Response\\BaseResponse.cs",
@@ -179,8 +204,7 @@
               "RelativeToolTip": "Dto\\Response\\BaseResponse.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAqwAYAAAAUAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-07-01T18:07:15.324Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-07-01T18:07:15.324Z"
             }
           ]
         }

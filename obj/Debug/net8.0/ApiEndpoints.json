@@ -1,6 +1,22 @@
 [
   {
     "ContainingType": "SigningService.Controllers.DocumentoController",
+    "Method": "FirmarRutasSignBox",
+    "RelativePath": "api/signDocument/firmar-rutas",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "request",
+        "Type": "SignDocumentService.Dto.Request.GenericRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "SigningService.Controllers.DocumentoController",
     "Method": "ObtenerRutas",
     "RelativePath": "api/signDocument/rutas",
     "HttpMethod": "POST",
@@ -13,7 +29,17 @@
         "IsRequired": true
       }
     ],
-    "ReturnTypes": []
+    "ReturnTypes": [
+      {
+        "Type": "System.Collections.Generic.List\u00601[[SignDocumentService.Dto.Response.RutasDocumentoResponse, SignDocumentService, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
   },
   {
     "ContainingType": "SigningService.Controllers.DocumentoController",

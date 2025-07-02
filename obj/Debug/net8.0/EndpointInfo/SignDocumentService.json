@@ -31,6 +31,63 @@
         },
         "responses": {
           "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/RutasDocumentoResponse"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/RutasDocumentoResponse"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/RutasDocumentoResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/signDocument/firmar-rutas": {
+      "post": {
+        "tags": [
+          "Documento"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GenericRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GenericRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/GenericRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
             "description": "OK"
           }
         }
@@ -137,6 +194,28 @@
             "nullable": true
           },
           "Dispositivo": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "RutasDocumentoResponse": {
+        "type": "object",
+        "properties": {
+          "Solicitud": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "Lote": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "CodigoDocumento": {
+            "type": "string",
+            "nullable": true
+          },
+          "RutaArchivo": {
             "type": "string",
             "nullable": true
           }
