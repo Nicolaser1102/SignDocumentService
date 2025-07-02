@@ -1,13 +1,10 @@
-﻿namespace SignDocumentService.Dto.Request
+﻿using SignDocumentService.Interfaces;
+namespace SignDocumentService.Dto.Request
+
 {
-    public class BaseRequest<T>
+    public class BaseRequest : IRequest, IDefaultInputRequest
     {
         public string UserName { get; set; }
-        public string SessionID { get; set; }
-        public string Action { get; set; }
-        public T Data { get; set; }
-        public double? Lon { get; set; }
-        public double? Lat { get; set; }
-        public string Dispositivo { get; set; }
+        public int SessionID { get; set; }
     }
 }

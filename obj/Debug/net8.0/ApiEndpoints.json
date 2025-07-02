@@ -8,24 +8,8 @@
     "Order": 0,
     "Parameters": [
       {
-        "Name": "dataRequest",
-        "Type": "SignDocumentService.Dto.Request.GenericRequest",
-        "IsRequired": true
-      }
-    ],
-    "ReturnTypes": []
-  },
-  {
-    "ContainingType": "SigningService.Controllers.DocumentoController",
-    "Method": "SignDocument",
-    "RelativePath": "api/signDocument/sign",
-    "HttpMethod": "POST",
-    "IsController": true,
-    "Order": 0,
-    "Parameters": [
-      {
         "Name": "request",
-        "Type": "SignDocumentService.Dto.Request.SignRequest",
+        "Type": "SignDocumentService.Dto.Request.GenericRequest",
         "IsRequired": true
       }
     ],

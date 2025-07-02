@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("SignDocumentService")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+b8737906a6d0f055571b69a4eb365802efcd30d2")]
 [assembly: System.Reflection.AssemblyProductAttribute("SignDocumentService")]
 [assembly: System.Reflection.AssemblyTitleAttribute("SignDocumentService")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

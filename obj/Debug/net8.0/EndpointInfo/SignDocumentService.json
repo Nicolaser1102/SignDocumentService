@@ -36,37 +36,6 @@
         }
       }
     },
-    "/api/signDocument/sign": {
-      "post": {
-        "tags": [
-          "Documento"
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/SignRequest"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/SignRequest"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/SignRequest"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
     "/api/signDocument/test": {
       "post": {
         "tags": [
@@ -151,17 +120,20 @@
             "type": "integer",
             "format": "int32"
           },
-          "Data": {
+          "Action": {
+            "type": "string",
             "nullable": true
           },
-          "Lon": {
-            "type": "number",
-            "format": "double",
+          "Data": {
+            "type": "string",
             "nullable": true
           },
           "Lat": {
-            "type": "number",
-            "format": "double",
+            "type": "string",
+            "nullable": true
+          },
+          "Lon": {
+            "type": "string",
             "nullable": true
           },
           "Dispositivo": {
