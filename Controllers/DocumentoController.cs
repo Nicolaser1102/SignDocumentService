@@ -1,8 +1,10 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Azure;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using SignBoxWorkerService.Services;
 using SignDocumentService.Dto.Request;
 using SignDocumentService.Dto.Response;
 using SignDocumentService.Services;
@@ -11,6 +13,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.ServiceProcess;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -27,16 +30,21 @@ namespace SigningService.Controllers
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly IConfiguration _config;
         private readonly ISignBoxService _signBoxService;
+        private readonly SignBoxStatusChecker _signBoxStatusChecker;
+
+
 
         public DocumentoController(ILogger<DocumentoController> logger,
                                     IHttpClientFactory httpClientFactory,
                                     IConfiguration config,
-                                    ISignBoxService signBoxService)
+                                    ISignBoxService signBoxService,
+                                    SignBoxStatusChecker signBoxStatusChecker)
         {
             _logger = logger;
             _httpClientFactory = httpClientFactory;
             _config = config;
             _signBoxService = signBoxService;
+            _signBoxStatusChecker = signBoxStatusChecker;
         }
 
         [HttpPost("rutas")]
@@ -57,7 +65,7 @@ namespace SigningService.Controllers
 
 
         [HttpPost("firmar-documentos")]
-        [Authorize]
+        //[Authorize]
         public async Task<IActionResult> FirmarDocumentoConTokenSignBoxFunciones([FromBody] GenericRequest request)
         {
             try
@@ -83,21 +91,55 @@ namespace SigningService.Controllers
                     });
 
                 // 2. Firmar cada documento
+
+
+                // ...
                 foreach (var doc in rutas)
                 {
                     var resultado = await FirmarDocumentoAsync(doc, token, "71,473,201,522", 2); // posición ejemplo
 
-                    if (!resultado)
+                    if (resultado == null)
                     {
-                        _logger.LogWarning("Fallo al firmar documento: {Codigo}", doc.CodigoDocumento);
-                        // Puedes continuar con los demás o devolver un error aquí
+                        _logger.LogWarning("❌ Fallo al firmar documento: {Codigo}", doc.CodigoDocumento);
+
+                        await InsertarRegistroDocumentoAsync(doc, new SignBoxSignResponse
+                        {
+                            Result = false,
+                            Status = "400",
+                            Detail = "Error al firmar documento o respuesta nula",
+                            WebhookTxt = "",
+                            WebhookPdf = ""
+                        });
+
+                        continue;
                     }
+
+                    await InsertarRegistroDocumentoAsync(doc, resultado);
                 }
+
+                // <<< AQUÍ: revisar los pendientes tras el proceso principal
+                await _signBoxStatusChecker.EjecutarRevisionAsync(CancellationToken.None);
+                _logger.LogInformation("🔁 Revisión de firmas ejecutada automáticamente después de firmar.");
+
+
+                // Iniciar el servicio si no estaba activo
+                var serviceManager = new WorkerService("SignBoxWorkerService");
+                if (serviceManager.ObtenerEstado() != ServiceControllerStatus.Running)
+                {
+                    serviceManager.IniciarServicio();
+                    _logger.LogInformation("Servicio SignBoxWorkerService iniciado.");
+                }
+                else
+                {
+                    _logger.LogInformation("Servicio SignBoxWorkerService ya estaba corriendo.");
+                }
+
+
 
                 return Ok(new GenericResponse
                 {
                     CodeReturn = 1,
-                    Message = "Todos los documentos procesados",
+                    Message = "Todos los documentos procesados y worker iniciado",
                     Result = null
                 });
             }
@@ -131,9 +173,35 @@ namespace SigningService.Controllers
             };
 
             return Ok(response);
-
-
         }
+
+
+        [HttpPost("reintentar-firmas")]
+        [Authorize]
+        public async Task<IActionResult> ReintentarFirmasDesdeAPI()
+        {
+            try
+            {
+                await _signBoxStatusChecker.EjecutarRevisionAsync(CancellationToken.None);
+
+                return Ok(new
+                {
+                    Message = "✅ Revisión de firmas ejecutada desde API"
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "❌ Error al ejecutar reintento de firmas desde API");
+
+                return StatusCode(500, new
+                {
+                    Message = "❌ Error ejecutando lógica del worker",
+                    Error = ex.Message
+                });
+            }
+        }
+
+
 
 
 
@@ -192,8 +260,8 @@ namespace SigningService.Controllers
         }
 
 
-
-        private async Task<bool> FirmarDocumentoAsync(RutasDocumentoResponse doc, string token, string posicion, int pagina)
+        //Metodo firmar documentos 
+        private async Task<SignBoxSignResponse?> FirmarDocumentoAsync(RutasDocumentoResponse doc, string token, string posicion, int pagina)
         {
             try
             {
@@ -203,11 +271,18 @@ namespace SigningService.Controllers
                 using var content = new MultipartFormDataContent();
 
                 // a) Documento PDF
+                // a) Documento PDF
                 if (!System.IO.File.Exists(doc.RutaArchivo))
                 {
+                    Console.WriteLine($"Ruta del archivo PDF: {doc.RutaArchivo}");
                     _logger.LogError("❌ El PDF no existe: {Ruta}", doc.RutaArchivo);
-                    return false;
+
+
+                    //Descomentar
+                    //return null;
+                    doc.RutaArchivo = null;
                 }
+
                 var pdfStream = System.IO.File.OpenRead(doc.RutaArchivo);
                 content.Add(new StreamContent(pdfStream), "fileIn", Path.GetFileName(doc.RutaArchivo));
 
@@ -227,8 +302,11 @@ namespace SigningService.Controllers
 
                 // c) Campos simples
                 content.Add(new StringContent($"pruebaGreensoft1"), "webhookId");
-                content.Add(new StringContent("1091583"), "username");
-                content.Add(new StringContent("RY3qn76H"), "password");
+                //Descomentar
+                //content.Add(new StringContent("1091583"), "username");
+                //content.Add(new StringContent("RY3qn76H"), "password");
+
+
                 content.Add(new StringContent("Javier123_"), "pin");
                 content.Add(new StringContent("Firma de contrato"), "reason");
                 content.Add(new StringContent("Quito"), "location");
@@ -257,17 +335,27 @@ namespace SigningService.Controllers
                 var respBody = await response.Content.ReadAsStringAsync();
                 _logger.LogInformation("📄 Respuesta firma {Doc}: {Resp}", doc.CodigoDocumento, respBody);
 
-                if (!response.IsSuccessStatusCode)
+                // 4) Deserializar JSON siempre, incluso si HTTP falla
+                SignBoxSignResponse? signResp = null;
+
+                try
                 {
-                    _logger.LogError("❌ HTTP {Status} al firmar {Doc}", response.StatusCode, doc.CodigoDocumento);
-                    return false;
+                    signResp = JsonSerializer.Deserialize<SignBoxSignResponse>(respBody, new JsonSerializerOptions
+                    {
+                        PropertyNameCaseInsensitive = true
+                    });
+                }
+                catch (Exception jsonEx)
+                {
+                    _logger.LogError(jsonEx, "❌ Error deserializando respuesta JSON para {Doc}", doc.CodigoDocumento);
                 }
 
-                // 4) Validar JSON de respuesta
-                var signResp = JsonSerializer.Deserialize<SignBoxSignResponse>(respBody, new JsonSerializerOptions
+                if (!response.IsSuccessStatusCode)
                 {
-                    PropertyNameCaseInsensitive = true
-                });
+                    _logger.LogError("❌ HTTP {Status} al firmar {Doc}. Respuesta: {Body}", response.StatusCode, doc.CodigoDocumento, respBody);
+                    return signResp;
+                }
+                // 5)Validar contenido
 
                 var ok = signResp?.Result == true
                       && signResp.Status?.StartsWith("200") == true
@@ -278,18 +366,38 @@ namespace SigningService.Controllers
                 else
                     _logger.LogWarning("⚠️ Firma no confirmada: {Detail}", signResp?.Detail);
 
-                return ok;
+                return signResp; ;
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "❌ Excepción firmando {Doc}", doc.CodigoDocumento);
-                return false;
+                return null;
             }
         }
 
 
+        private async Task InsertarRegistroDocumentoAsync(RutasDocumentoResponse doc, SignBoxSignResponse response)
+        {
+            var connStr = _config.GetConnectionString("Default");
 
+            using var conn = new SqlConnection(connStr);
+            using var cmd = new SqlCommand(@"
+        INSERT INTO PARAMETROS..RE_DOCUMENTOS_SIGNBOX 
+        (Solicitud, Lote, CodigoDocumento, WebhookTxt, WebhookPdf, DetailId, Estado, Intentos, FechaRegistro)
+        VALUES (@Solicitud, @Lote, @Codigo, @WebhookTxt, @WebhookPdf, @Detail, @Estado, 0, GETDATE())
+    ", conn);
 
+            cmd.Parameters.AddWithValue("@Solicitud", doc.Solicitud);
+            cmd.Parameters.AddWithValue("@Lote", doc.Lote);
+            cmd.Parameters.AddWithValue("@Codigo", doc.CodigoDocumento);
+            cmd.Parameters.AddWithValue("@WebhookTxt", (object?)response.WebhookTxt ?? DBNull.Value);
+            cmd.Parameters.AddWithValue("@WebhookPdf", (object?)response.WebhookPdf ?? DBNull.Value);
+            cmd.Parameters.AddWithValue("@Detail", (object?)response.Detail ?? DBNull.Value);
+            cmd.Parameters.AddWithValue("@Estado", response.Result && response.Status.StartsWith("200") ? "OK" : "PENDIENTE");
+
+            await conn.OpenAsync();
+            await cmd.ExecuteNonQueryAsync();
+        }
 
     }
 }

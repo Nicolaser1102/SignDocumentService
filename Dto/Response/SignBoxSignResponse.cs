@@ -1,4 +1,5 @@
-﻿using System.Text.Json.Serialization;
+﻿using SignDocumentService.Utils;
+using System.Text.Json.Serialization;
 
 namespace SignDocumentService.Dto.Response
 {
@@ -11,6 +12,7 @@ namespace SignDocumentService.Dto.Response
         public string Detail { get; set; }
 
         [JsonPropertyName("status")]
+        [JsonConverter(typeof(StringToJsonConverter))]
         public string Status { get; set; }
 
         [JsonPropertyName("webhookTxt")]
@@ -19,5 +21,8 @@ namespace SignDocumentService.Dto.Response
         [JsonPropertyName("webhookPdf")]
         public string WebhookPdf { get; set; }
     }
+
+
+
 
 }

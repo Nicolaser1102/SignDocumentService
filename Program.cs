@@ -8,6 +8,8 @@ using Microsoft.IdentityModel.Tokens;
 using SignDocumentService.Services;
 using SignDocumentService.Services.SignDocumentService.Services;
 using System.Text;
+using SignBoxWorkerService.Services;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -50,6 +52,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddSingleton<IConfiguration>(builder.Configuration);
 builder.Services.AddScoped<ISignBoxService, SignBoxService>();
+builder.Services.AddTransient<SignBoxStatusChecker>(); // <-- aquí
 
 var app = builder.Build();
 
