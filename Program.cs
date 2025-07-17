@@ -5,10 +5,10 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
-using SignDocumentService.Services;
 using SignDocumentService.Services.SignDocumentService.Services;
 using System.Text;
 using SignBoxWorkerService.Services;
+using SignDocumentService.Services.Interfaces;
 
 
 var builder = WebApplication.CreateBuilder(args);
