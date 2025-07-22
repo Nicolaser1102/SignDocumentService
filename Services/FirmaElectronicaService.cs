@@ -8,6 +8,7 @@
     using Microsoft.Extensions.Logging;
     using Microsoft.Extensions.Options;
     using Models;
+    using System;
     using System.Data;
     using System.Net.Http;
     using System.Net.Http.Headers;
@@ -41,59 +42,120 @@
 
             }
 
+            //1 étodo para obtener el token JWT desde el servicio Orion API
+            private async Task<string> ObtenerTokenJwtAsync()
 
-            //?Método obtener rutas desde el sp.
-            public async Task<List<RutasDocumentoResponse>> ObtenerRutasDesdeSp(GenericRequest request)
             {
-                var connStr = _config.GetConnectionString("Default");
-                using var conn = new SqlConnection(connStr);
-                using var cmd = new SqlCommand("BancaVirtual.spGenericoExecute", conn)
+
+                var client = _httpClientFactory.CreateClient();
+                _logger.LogInformation("📡 Solicitando token JWT...");
+                string url = _urls.LoginUrl;
+
+                var login = new LoginRequestGS
                 {
-                    CommandType = CommandType.StoredProcedure
+                    UserName = _urls.LoginUser,
+                    Password = _urls.LoginPassword
                 };
 
-                // Parámetros de entrada
-                cmd.Parameters.AddWithValue("@_UserName", request.UserName ?? "");
-                cmd.Parameters.AddWithValue("@_SessionID", request.SessionID);
-                cmd.Parameters.AddWithValue("@Action", "credito-web/obtener-url-documentos");
-                cmd.Parameters.AddWithValue("@Request", request.Data ?? "");
-                cmd.Parameters.AddWithValue("@_Lat", string.IsNullOrEmpty(request.Lat) ? DBNull.Value : (object)request.Lat);
-                cmd.Parameters.AddWithValue("@_Lon", string.IsNullOrEmpty(request.Lon) ? DBNull.Value : (object)request.Lon);
-                cmd.Parameters.AddWithValue("@Dispositivo", string.IsNullOrEmpty(request.Dispositivo) ? DBNull.Value : (object)request.Dispositivo);
+                var json = JsonSerializer.Serialize(login);
+                var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-                // Parámetros de salida
-                var pCode = new SqlParameter("@_CodeReturn", SqlDbType.Int) { Direction = ParameterDirection.Output };
-                var pMessage = new SqlParameter("@_Message", SqlDbType.NVarChar, 200) { Direction = ParameterDirection.Output };
-                var pResult = new SqlParameter("@Result", SqlDbType.NVarChar, -1) { Direction = ParameterDirection.Output };
-                cmd.Parameters.Add(pCode);
-                cmd.Parameters.Add(pMessage);
-                cmd.Parameters.Add(pResult);
+                var response = await client.PostAsync(url, content);
+                var body = await response.Content.ReadAsStringAsync();
 
-                await conn.OpenAsync();
-                await cmd.ExecuteNonQueryAsync();
+                Console.WriteLine(login);
 
-                var codeReturn = (int)(pCode.Value ?? -99);
-                var message = pMessage.Value?.ToString();
-                var json = pResult.Value?.ToString();
-
-                if (codeReturn != 1)
-                    throw new InvalidOperationException($"SP falló: {message}");
-
-                if (string.IsNullOrWhiteSpace(json))
-                    return new List<RutasDocumentoResponse>();
-
-                var options = new JsonSerializerOptions
+                if (!response.IsSuccessStatusCode)
                 {
-                    PropertyNameCaseInsensitive = true,
-                    NumberHandling = JsonNumberHandling.AllowReadingFromString
-                };
+                    throw new ApplicationException($"Login fallido: {body}");
+                }
 
+                var result = JsonSerializer.Deserialize<LoginResponse>(body, new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true
+                });
 
-                var rutas = JsonSerializer.Deserialize<List<RutasDocumentoResponse>>(json, options)
-                ?? new List<RutasDocumentoResponse>();
+                if (result == null || string.IsNullOrEmpty(result.Token))
+                {
+                    throw new ApplicationException($"Error de autenticación: {"Respuesta vacía"}");
+                }
 
-                return rutas;
+                return result.Token;
             }
+
+            Task<string> IFirmaElectronicaService.ObtenerTokenJwtAsync()
+            {
+                return ObtenerTokenJwtAsync();
+            }
+
+
+
+            // 2. Método obtener rutas desde el sp.
+            public async Task<List<RutasDocumentoResponse>> ObtenerRutasDocumentos(int idSolicitud, int lote)
+            {
+
+                //RutaPara Ejecutar Sps
+                string url = _urls.GenericExecuteUrl;
+
+                //Obtener token para usar la Orion Api
+                string tokenJwt = await ObtenerTokenJwtAsync();
+
+                var client = _httpClientFactory.CreateClient();
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", tokenJwt);
+
+                var request = new GenericRequestIntegracion
+                {
+                    Action = "credito-web/obtener-url-documentos",
+                    Data = JsonSerializer.Serialize(new
+                    {
+                        idSolicitud = idSolicitud,
+                        lote = lote,
+                    })
+                };
+
+
+                var json = JsonSerializer.Serialize(request);
+                var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+                var response = await client.PostAsync(url, content);
+                var body = await response.Content.ReadAsStringAsync();
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    throw new ApplicationException($"Error HTTP: {response.StatusCode} - {response.ReasonPhrase}");
+                }
+
+                Console.WriteLine("BODY:");
+                Console.WriteLine(body);
+
+                var result = JsonSerializer.Deserialize<GenericResponse<List<RutasDocumentoResponse>>>(body, new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true
+                });
+
+                if (result == null)
+                {
+                    _logger.LogWarning("Respuesta vacía del backend al obtener rutas.");
+                    return new List<RutasDocumentoResponse>();
+                }
+
+                if (result.CodeReturn != 1)
+                {
+                    _logger.LogWarning("Backend respondió sin éxito: {Message}", result.Message);
+                    return new List<RutasDocumentoResponse>();
+                }
+
+                if (result.Result == null || !result.Result.Any())
+                {
+                    _logger.LogInformation("No hay lotes de documentos por procesar");
+                    return new List<RutasDocumentoResponse>();
+                }
+
+
+                return result.Result;
+            }
+
+
 
             public async Task<string> ObtenerTokenSignBoxAsync()
             {
@@ -326,50 +388,9 @@
 
 
 
-            private async Task<string> ObtenerTokenJwtAsync()
+            
 
-            {
-
-                var client = _httpClientFactory.CreateClient();
-                _logger.LogInformation("📡 Solicitando token JWT...");
-                string url = _urls.LoginUrl;
-
-                var login = new LoginRequestGS
-                {
-                    UserName = _urls.LoginUser,
-                    Password = _urls.LoginPassword
-                };
-
-                var json = JsonSerializer.Serialize(login);
-                var content = new StringContent(json, Encoding.UTF8, "application/json");
-
-                var response = await client.PostAsync(url, content);
-                var body = await response.Content.ReadAsStringAsync();
-
-                Console.WriteLine(login);
-
-                if (!response.IsSuccessStatusCode)
-                {
-                    throw new ApplicationException($"Login fallido: {body}");
-                }
-
-                var result = JsonSerializer.Deserialize<LoginResponse>(body, new JsonSerializerOptions
-                {
-                    PropertyNameCaseInsensitive = true
-                });
-
-                if (result == null || string.IsNullOrEmpty(result.Token))
-                {
-                    throw new ApplicationException($"Error de autenticación: {"Respuesta vacía"}");
-                }
-
-                return result.Token;
-            }
-
-            Task<string> IFirmaElectronicaService.ObtenerTokenJwtAsync()
-            {
-                return ObtenerTokenJwtAsync();
-            }
+            
         }
 
     } 

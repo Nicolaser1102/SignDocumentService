@@ -28,7 +28,7 @@ public class ExternalUrls
     public string ObtenerSmsUrl { get; set; }
     public string ActualizarSmsUrl { get; set; }
     public string AuthSmsUrl { get; set; }
-    public string EnviarSmsUrl { get; set; }
+    public string GenericExecuteUrl { get; set; }
     public string LoginUser { get; set; }
     public string LoginPassword { get; set; }
     public string NameService { get; set; }
@@ -36,3 +36,12 @@ public class ExternalUrls
     public string NamePC { get; set; }
     public string LoginAPP { get; set; }
 }
+
+public class GenericRequestIntegracion
+{
+    public string Action { get; set; } = string.Empty;
+    public object? Data { get; set; }
+
+
+}
+

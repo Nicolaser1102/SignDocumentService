@@ -47,7 +47,7 @@ namespace SigningService.Controllers
 
         [HttpPost("firmar-documentos")]
         [Authorize]
-        public async Task<IActionResult> FirmarDocumentoConTokenSignBoxFunciones([FromBody] GenericRequest request)
+        public async Task<IActionResult> FirmarDocumentoConTokenSignBoxFunciones([FromBody] SignRequest request)
         {
             try
             {
@@ -56,7 +56,26 @@ namespace SigningService.Controllers
 
 
                 // 1. Obtener rutas
-                var rutas = await _firmaElectronicaService.ObtenerRutasDesdeSp(request);
+
+
+
+                // Extraer idSolicitud y lote del campo Data del request
+                int idSolicitud = 0;
+                int lote = 0;
+                 idSolicitud = request.Solicitud;
+                lote = request.Lote;
+               
+                if(idSolicitud ==0 || lote == 0)
+                return StatusCode(500, new GenericResponse
+                {
+                    CodeReturn = -1,
+                    Message = "No se pudo obtener los parámetros correctamente",
+                    Result = "NO_PARAMS"
+                });
+
+
+
+                var rutas = await _firmaElectronicaService.ObtenerRutasDocumentos(idSolicitud,lote);
                 if (rutas == null || !rutas.Any())
                 {
                     return StatusCode(500,new GenericResponse
@@ -67,6 +86,13 @@ namespace SigningService.Controllers
                     });
                 }
 
+
+                return Ok(new GenericResponse
+                {
+                    CodeReturn = 1,
+                    Message = "Todos los documentos procesados y worker iniciado",
+                    Result = "OK"
+                });
 
 
                 // 2. Obtener token usando el servicio inyectado
@@ -93,11 +119,11 @@ namespace SigningService.Controllers
 
                 // ————————————————
                 // A. Extraer idSolicitud y lote de request.Data
-                using var docData = JsonDocument.Parse(request.Data ?? "{}");
-                var root = docData.RootElement;
-                var idSol = root.GetProperty("idSolicitud").GetInt32();
-                var lote = root.GetProperty("lote").GetInt32();
-                Console.WriteLine($"idSol: {idSol}, lote: {lote}");
+                //using var docData = JsonDocument.Parse(request.Data ?? "{}");
+                //var root = docData.RootElement;
+                //var idSol = root.GetProperty("idSolicitud").GetInt32();
+                //var lote = root.GetProperty("lote").GetInt32();
+                //Console.WriteLine($"idSol: {idSol}, lote: {lote}");
 
 
    
@@ -153,18 +179,6 @@ namespace SigningService.Controllers
 
         }
 
-
-
-
-
-
-
-
-
-
-
-
-        
 
     }
 }
