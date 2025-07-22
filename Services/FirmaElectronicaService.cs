@@ -6,26 +6,39 @@
     using Microsoft.Data.SqlClient;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.Logging;
+    using Microsoft.Extensions.Options;
+    using Models;
     using System.Data;
     using System.Net.Http;
     using System.Net.Http.Headers;
+    using System.Text;
     using System.Text.Json;
     using System.Text.Json.Serialization;
     using System.Threading.Tasks;
 
     namespace SignDocumentService.Services
     {
-        public class SignBoxService : ISignBoxService
+        public class FirmaElectronicaService : IFirmaElectronicaService
         {
             private readonly IHttpClientFactory _httpClientFactory;
-            private readonly ILogger<SignBoxService> _logger;
+            private readonly ILogger<FirmaElectronicaService> _logger;
             private readonly IConfiguration _config;
+            private readonly ExternalUrls _urls;
 
-            public SignBoxService(IHttpClientFactory httpClientFactory, ILogger<SignBoxService> logger, IConfiguration config)
+            public FirmaElectronicaService(IHttpClientFactory httpClientFactory, ILogger<FirmaElectronicaService> logger, IConfiguration config, IOptions<ExternalUrls> urls)
             {
                 _httpClientFactory = httpClientFactory;
                 _logger = logger;
                 _config = config;
+                _urls = urls.Value;
+
+                Console.WriteLine(_urls);
+                if (_urls == null)
+                {
+                    _logger.LogError("❌ ExternalUrls es null. Verifica appsettings.json");
+                    throw new NullReferenceException("ExternalUrls es null.");
+                }
+
             }
 
 
@@ -112,7 +125,7 @@
 
 
 
-        
+
             public async Task<GenericResponse> FirmarLoteDocumentosAsync(List<RutasDocumentoResponse> rutas, string token)
             {
                 try
@@ -190,13 +203,6 @@
                         Console.WriteLine($"Ruta del archivo PDF: {doc.RutaArchivo}");
                         _logger.LogError("❌ El PDF no existe: {Ruta}", doc.RutaArchivo);
 
-
-                        //Descomentar/Comentar para pruebas 
-                        //{
-
-                        return null;
-                        //doc.RutaArchivo = null;
-                        //}
                     }
 
                     //Añadir como parámetro el PDF
@@ -217,11 +223,14 @@
                     }
 
                     // c) Campos simples
-                    content.Add(new StringContent($"pruebaGreensoft1"), "webhookId");
+
+
+                    var webhookId = $"{doc.CodigoDocumento}_{doc.Solicitud}_{doc.Lote}";
+                    content.Add(new StringContent(webhookId), "webhookId");
 
                     //Descomentar/ Comentar para pruebas
-                    //content.Add(new StringContent("1091583"), "username");
-                    //content.Add(new StringContent("RY3qn76H"), "password");
+                    content.Add(new StringContent("1091583"), "username");
+                    content.Add(new StringContent("RY3qn76H"), "password");
 
 
                     content.Add(new StringContent("Javier123_"), "pin");
@@ -298,10 +307,10 @@
 
                 using var conn = new SqlConnection(connStr);
                 using var cmd = new SqlCommand(@"
-        INSERT INTO PARAMETROS..RE_DOCUMENTOS_SIGNBOX 
-        (Solicitud, Lote, CodigoDocumento, WebhookTxt, WebhookPdf, DetailId, Estado, Intentos, FechaRegistro)
-        VALUES (@Solicitud, @Lote, @Codigo, @WebhookTxt, @WebhookPdf, @Detail, @Estado, 0, GETDATE())
-    ", conn);
+                        INSERT INTO PARAMETROS..RE_DOCUMENTOS_SIGNBOX 
+                        (Solicitud, Lote, CodigoDocumento, WebhookTxt, WebhookPdf, DetailId, Estado, Intentos, FechaRegistro)
+                        VALUES (@Solicitud, @Lote, @Codigo, @WebhookTxt, @WebhookPdf, @Detail, @Estado, 0, GETDATE())
+                    ", conn);
 
                 cmd.Parameters.AddWithValue("@Solicitud", doc.Solicitud);
                 cmd.Parameters.AddWithValue("@Lote", doc.Lote);
@@ -315,9 +324,55 @@
                 await cmd.ExecuteNonQueryAsync();
             }
 
-            
+
+
+            private async Task<string> ObtenerTokenJwtAsync()
+
+            {
+
+                var client = _httpClientFactory.CreateClient();
+                _logger.LogInformation("📡 Solicitando token JWT...");
+                string url = _urls.LoginUrl;
+
+                var login = new LoginRequestGS
+                {
+                    UserName = _urls.LoginUser,
+                    Password = _urls.LoginPassword
+                };
+
+                var json = JsonSerializer.Serialize(login);
+                var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+                var response = await client.PostAsync(url, content);
+                var body = await response.Content.ReadAsStringAsync();
+
+                Console.WriteLine(login);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    throw new ApplicationException($"Login fallido: {body}");
+                }
+
+                var result = JsonSerializer.Deserialize<LoginResponse>(body, new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true
+                });
+
+                if (result == null || string.IsNullOrEmpty(result.Token))
+                {
+                    throw new ApplicationException($"Error de autenticación: {"Respuesta vacía"}");
+                }
+
+                return result.Token;
+            }
+
+            Task<string> IFirmaElectronicaService.ObtenerTokenJwtAsync()
+            {
+                return ObtenerTokenJwtAsync();
+            }
         }
-    }
+
+    } 
 }
 
         

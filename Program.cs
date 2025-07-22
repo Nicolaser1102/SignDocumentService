@@ -1,14 +1,9 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
+using Models;
+using SignDocumentService.Services.Interfaces;
 using SignDocumentService.Services.SignDocumentService.Services;
 using System.Text;
-using SignBoxWorkerService.Services;
-using SignDocumentService.Services.Interfaces;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -20,8 +15,12 @@ var secretKey = jwtConfig["SecretKey"];
 var issuer = jwtConfig["IssuerToken"];
 var audience = jwtConfig["AudienceToken"];
 
+//External Urls
+builder.Services.Configure<ExternalUrls>(builder.Configuration.GetSection("ServiciosExternos"));
+
+
 builder.Services.AddAuthentication(options =>
-{
+{  
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
 })
@@ -51,8 +50,8 @@ builder.Services.AddHttpClient();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddSingleton<IConfiguration>(builder.Configuration);
-builder.Services.AddScoped<ISignBoxService, SignBoxService>();
-builder.Services.AddTransient<SignBoxStatusChecker>(); // <-- aquí
+builder.Services.AddScoped<IFirmaElectronicaService, FirmaElectronicaService>();
+
 
 var app = builder.Build();
 

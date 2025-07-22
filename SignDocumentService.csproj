@@ -12,10 +12,5 @@
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
     <PackageReference Include="System.ServiceProcess.ServiceController" Version="9.0.7" />
   </ItemGroup>
-<ItemGroup>
-  <ProjectReference Include="..\SignBoxWorkerService\SignBoxWorkerService.csproj" />
-	
-
-</ItemGroup>
 
 </Project>
