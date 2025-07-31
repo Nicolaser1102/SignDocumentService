@@ -8,7 +8,7 @@ using SignDocumentService.Dto.Request;
 using SignDocumentService.Dto.Response;
 using SignDocumentService.Services;
 using SignDocumentService.Services.Interfaces;
-
+using System.Runtime.InteropServices;
 using System.ServiceProcess;
 using System.Text.Json;
 
@@ -52,12 +52,6 @@ namespace SigningService.Controllers
             try
             {
 
-                //**************************************** INICIO SIGN BOX FIRMADO ******************************************//
-
-
-                // 1. Obtener rutas
-
-
 
                 // Extraer idSolicitud y lote del campo Data del request
                 int idSolicitud = 0;
@@ -86,53 +80,19 @@ namespace SigningService.Controllers
                     });
                 }
 
-
-                return Ok(new GenericResponse
-                {
-                    CodeReturn = 1,
-                    Message = "Todos los documentos procesados y worker iniciado",
-                    Result = "OK"
-                });
+                _logger.LogInformation("🔍 Rutas obtenidas: {rutas}", JsonSerializer.Serialize(rutas));
 
 
-                // 2. Obtener token usando el servicio inyectado
-                var token = await _firmaElectronicaService.ObtenerTokenSignBoxAsync();
-                if (string.IsNullOrEmpty(token))
-                    return StatusCode(500, new GenericResponse
-                    {
-                        CodeReturn = -2,
-                        Message = "No se pudo autenticar con SignBox",
-                        Result = "FALLO AL OBTENER TOKEN SIGNBOX"
-                    });
+           
+               await _firmaElectronicaService.InsertarRegistroDocumentoAsync(rutas);
 
 
-                // 3. Firmar cada documento
-                var resultadoFirmarLote = await _firmaElectronicaService.FirmarLoteDocumentosAsync(rutas,token);
-                if (resultadoFirmarLote.CodeReturn != 1)
-                {
-                    return StatusCode(500,resultadoFirmarLote); 
-                }
-
-
-                //**************************************** FIN SIGN BOX FIRMADO ******************************************
-
-
-                // ————————————————
-                // A. Extraer idSolicitud y lote de request.Data
-                //using var docData = JsonDocument.Parse(request.Data ?? "{}");
-                //var root = docData.RootElement;
-                //var idSol = root.GetProperty("idSolicitud").GetInt32();
-                //var lote = root.GetProperty("lote").GetInt32();
-                //Console.WriteLine($"idSol: {idSol}, lote: {lote}");
-
-
-   
 
 
                 return Ok(new GenericResponse
                 {
                     CodeReturn = 1,
-                    Message = "Todos los documentos procesados y worker iniciado",
+                    Message = "Todos los documentos insertados",
                     Result = "OK"
                 });
             }
