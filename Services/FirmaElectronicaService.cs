@@ -1,20 +1,16 @@
 ﻿namespace SignDocumentService.Services
 {
-    using global::SignDocumentService.Dto.Request;
     using global::SignDocumentService.Dto.Response;
     using global::SignDocumentService.Services.Interfaces;
-    using Microsoft.Data.SqlClient;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.Logging;
     using Microsoft.Extensions.Options;
     using Models;
     using System;
-    using System.Data;
     using System.Net.Http;
     using System.Net.Http.Headers;
     using System.Text;
     using System.Text.Json;
-    using System.Text.Json.Serialization;
     using System.Threading.Tasks;
 
     namespace SignDocumentService.Services
@@ -48,7 +44,6 @@
             {
 
                 var client = _httpClientFactory.CreateClient();
-                _logger.LogInformation("📡 Solicitando token JWT...");
                 string url = _urls.LoginUrl;
 
                 var login = new LoginRequestGS
