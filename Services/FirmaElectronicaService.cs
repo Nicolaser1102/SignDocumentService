@@ -55,8 +55,12 @@
                 var json = JsonSerializer.Serialize(login);
                 var content = new StringContent(json, Encoding.UTF8, "application/json");
 
+                _logger.LogWarning("Antes de obtener token");
+
                 var response = await client.PostAsync(url, content);
                 var body = await response.Content.ReadAsStringAsync();
+
+                _logger.LogWarning("Después de obtener token");
 
                 Console.WriteLine(login);
 
@@ -112,6 +116,8 @@
                 var json = JsonSerializer.Serialize(request);
                 var content = new StringContent(json, Encoding.UTF8, "application/json");
 
+                _logger.LogWarning("Antes de obtener documentos");
+
                 var response = await client.PostAsync(url, content);
                 var body = await response.Content.ReadAsStringAsync();
 
@@ -119,6 +125,9 @@
                 {
                     throw new ApplicationException($"Error HTTP: {response.StatusCode} - {response.ReasonPhrase}");
                 }
+
+                  
+                _logger.LogWarning("Despues de obtener documentos");
 
 
                 var result = JsonSerializer.Deserialize<GenericResponse<List<RutasDocumentoResponse>>>(body, new JsonSerializerOptions
@@ -171,6 +180,9 @@
                 var json = JsonSerializer.Serialize(request);
                 var content = new StringContent(json, Encoding.UTF8, "application/json");
 
+
+                _logger.LogWarning("Antes de obtener insertar registros de firma electronica");
+
                 var response = await client.PostAsync(url, content);
                 var body = await response.Content.ReadAsStringAsync();
 
@@ -179,6 +191,7 @@
                     throw new ApplicationException($"Error HTTP: {response.StatusCode} - {response.ReasonPhrase}");
                 }
 
+                _logger.LogWarning("Despues de obtener insertar registros de firma electronica");
 
                 var result = JsonSerializer.Deserialize<GenericResponse<List<RutasDocumentoResponse>>>(body, new JsonSerializerOptions
                 {

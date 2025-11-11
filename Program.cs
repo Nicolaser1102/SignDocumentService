@@ -55,16 +55,18 @@ builder.Services.AddScoped<IFirmaElectronicaService, FirmaElectronicaService>();
 
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
-{
+
+
     app.UseDeveloperExceptionPage();
     app.UseSwagger();
     app.UseSwaggerUI(c =>
     {
-        c.SwaggerEndpoint("/swagger/v1/swagger.json", "SigningService v1");
+        c.SwaggerEndpoint("v1/swagger.json", "SigningService v1");
         c.RoutePrefix = "swagger";
     });
-}
+
+//Siempre utilice Https
+app.UseHttpsRedirection();
 
 app.UseRouting();
 

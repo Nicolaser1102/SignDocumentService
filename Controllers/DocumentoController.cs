@@ -6,6 +6,7 @@ using Microsoft.Extensions.Options;
 using Models;
 using SignDocumentService.Dto.Request;
 using SignDocumentService.Dto.Response;
+using SignDocumentService.Interfaces;
 using SignDocumentService.Services;
 using SignDocumentService.Services.Interfaces;
 using System.Runtime.InteropServices;
@@ -47,7 +48,7 @@ namespace SigningService.Controllers
 
         [HttpPost("firmar-documentos")]
         [Authorize]
-        public async Task<IActionResult> FirmarDocumentoConTokenSignBoxFunciones([FromBody] SignRequest request)
+        public async Task<IActionResult> FirmarDocumentoConTokenSignBoxFunciones([FromBody] GenericRequest request)
         {
             try
             {
@@ -56,10 +57,11 @@ namespace SigningService.Controllers
                 // Extraer idSolicitud y lote del campo Data del request
                 int idSolicitud = 0;
                 int lote = 0;
-                 idSolicitud = request.Solicitud;
-                lote = request.Lote;
-               
-                if(idSolicitud ==0 || lote == 0)
+                var jsonData = JsonDocument.Parse(request.Data.ToString());
+                idSolicitud = jsonData.RootElement.GetProperty("idSolicitud").GetInt32();
+                lote = jsonData.RootElement.GetProperty("lote").GetInt32();
+
+                if (idSolicitud ==0 || lote == 0)
                 return StatusCode(500, new GenericResponse
                 {
                     CodeReturn = -1,
@@ -112,9 +114,8 @@ namespace SigningService.Controllers
 
 
 
-        [HttpPost("test")]
-        [Authorize]
-        public async Task<IActionResult> ProbarConexion([FromBody] SignRequest request)
+        [HttpPost("ping")]
+        public async Task<IActionResult> ProbarConexion([FromBody] GenericRequest request)
         {
 
             
@@ -124,13 +125,19 @@ namespace SigningService.Controllers
 
 
             var token = HttpContext.Request.Headers["Authorization"].ToString();
-            _logger.LogInformation("🔐 Token recibido: {token}", tokenJwt);
+
+            int idSolicitud = 0;
+            int lote = 0;
+            var jsonData = JsonDocument.Parse(request.Data.ToString());
+            idSolicitud = jsonData.RootElement.GetProperty("idSolicitud").GetInt32();
+            lote = jsonData.RootElement.GetProperty("lote").GetInt32();
+
 
             var response = new GenericResponse
             {
                 CodeReturn = 1,
                 Message = "Petición recibida exitosamente en SignService",
-                Result = $"Solicitud: {request.Solicitud}, Lote: {request.Lote}, Usuario: {request.UserName}, SessionID: {request.SessionID}"
+                Result = $"Solicitud: {idSolicitud}, Lote: {lote}, Usuario: {request.UserName}, SessionID: {request.SessionID}"
             };
 
             return Ok(response);
